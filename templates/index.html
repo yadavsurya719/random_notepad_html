@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   
+    <title>Dynamic Notepad</title>
+    <style>
+     body {
+    margin: 0;
+    padding: 0;
+    animation: colorChange 5s infinite alternate; /* Change color every 5 seconds */
+}
+
+@keyframes colorChange {
+    0% {
+        background-color: #d967e4;
+    }
+    50% {
+        background-color: #3f93b4; /* Change to the desired color */
+    }
+    100% {
+        background-color: #d967e4;
+    }
+}
+
+        .navbar {
+            background-image: url('./images.jfif');
+            background-size: cover;
+            padding: 20px;
+            text-align: center;
+            background-color: #3577b4;
+        }
+
+        .navbar-logo {
+        display: flex;
+        align-items: center;
+            }
+
+            .navbar-logo img {
+                width: 50px;
+                height: auto;
+                margin-right: 10px;
+                align-self: center; /* Align the image vertically in the center */
+            }
+        .name {
+            animation: changeColor 5s infinite;
+            text-align: center;
+            margin: auto;
+            font-size: 50px; /* Corrected 'size' to 'font-size' */
+        }
+        @keyframes changeColor {
+            0% {
+                color: rgb(255, 0, 0);
+            }
+            50% {
+                color: rgb(0, 255, 0);
+            }
+            100% {
+                color: rgb(255, 0, 0);
+            }
+        }
+
+       
+ 
+        .inner-container {
+            background-color: #ffffff;
+            padding: 10px;
+            margin: 10px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .container {
+            width: 80%;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background-color: #3498db; /* Initial background color */
+            color: white;
+            transition: background-color 0.5s ease; /* Smooth transition for background color */
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .notepad {
+            margin-top: 20px;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 50px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            resize: vertical;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+            color: #fff;
+        }
+
+        .next-page-btn {
+            background-color: #27ae60;
+        }
+
+        .download-btn {
+            background-color: #3498db;
+        }
+        .delete-pages-btn {
+            background-color: #e74c3c;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+    
+            <span class="name">Surya</span>
+        </div>
+    </nav>
+    <div class="outer-container">
+        <div class="inner-container">
+            <h1>Welcome to My Notepad</h1>
+            <div class="notepad">
+                <textarea id="notepad" rows="10" cols="30" placeholder="Start typing your notes..."></textarea>
+            </div>
+            <button id="nextPageBtn" class="button next-page-btn" onclick="nextPage()">Next Page</button>
+            <button id="downloadBtn" class="button download-btn" onclick="downloadText()">Download</button>
+            <button class="button delete-pages-btn" onclick="deleteAllPages()">Delete Pages</button>
+        </div>
+    </div>
+
+   
+    <script>
+        let pageCounter = 0;
+
+        function nextPage() {
+            pageCounter++;
+            createNotepadContainer();
+        }
+
+        function createNotepadContainer() {
+            const notepadTextarea = document.getElementById('notepad');
+            const container = document.createElement('div');
+            container.classList.add('container');
+            container.style.backgroundColor = getRandomColor();
+            container.innerHTML = `
+                <h1>Page ${pageCounter}</h1>
+                <div class="notepad">
+                    <textarea rows="10" cols="30" placeholder="Start typing your notes..."></textarea>
+                </div>
+            `;
+            document.body.appendChild(container);
+
+            // Save the content of the current notepad
+            const currentPageContent = notepadTextarea.value;
+
+            // Clear text in the current notepad
+            notepadTextarea.value = '';
+
+            // Set the content of the new notepad to the content of the previous notepad
+            const newNotepadTextarea = container.querySelector('.notepad textarea');
+            newNotepadTextarea.value = currentPageContent;
+        }
+        function getRandomColor() {
+            const letters = '0123456789ABCDEF';
+            let color = '#';
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+
+        function downloadText() {
+            const notepadTextarea = document.getElementById('notepad');
+            const content = notepadTextarea.value;
+            const blob = new Blob([content], { type: 'text/plain' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'notepad_content.txt';
+            link.click();
+       }
+      
+    function applyAutoCorrection() {
+        const notepadTextarea = document.getElementById('notepad');
+        const currentCursorPosition = notepadTextarea.selectionStart;
+
+        // Get the content before and after the cursor
+        const textBeforeCursor = notepadTextarea.value.substring(0, currentCursorPosition);
+        const textAfterCursor = notepadTextarea.value.substring(currentCursorPosition);
+
+        // Apply auto-correction to the entire content
+        const correctedContent = correctSpelling(notepadTextarea.value);
+
+        // Restore the cursor position
+        notepadTextarea.value = correctedContent;
+        notepadTextarea.setSelectionRange(currentCursorPosition, currentCursorPosition);
+    }
+    function deleteAllPages() {
+            // Remove all containers starting from the second one (index 1)
+            const containers = document.querySelectorAll('.container');
+            for (let i = containers.length - 1; i > 0; i--) {
+                containers[i].remove();
+            }
+
+            // Reset the page counter
+            pageCounter = 1;
+
+            // Update the welcome heading dynamically
+            const welcomeHeading = document.querySelector('h1');
+            welcomeHeading.textContent = 'Welcome to My Notepad';
+        }
+        function deleteAllPages() {
+            // Remove all containers starting from the second one (index 1)
+            const containers = document.querySelectorAll('.container');
+            for (let i = containers.length - 1; i > 0; i--) {
+                containers[i].remove();
+            }
+        }
+
+// Run the function every 5 seconds
+                setInterval(changeColor, 5000);
+
+    </script>
+    
+</body>
+</html>
